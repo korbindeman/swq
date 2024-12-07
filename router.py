@@ -2,14 +2,14 @@ from typing import Callable
 
 
 class Router:
-    activeRoute = ""
+    active_route = ""
     routes = {}
 
-    def addRoute(self, routeKey: str, routeCallback: Callable) -> None:
+    def add_route(self, routeKey: str, routeCallback: Callable) -> None:
         self.routes[routeKey] = routeCallback
 
-    def routeTo(self, routeKey: str) -> None:
-        self.activeRoute = routeKey
+    def route_to(self, routeKey: str) -> None:
+        self.active_route = routeKey
 
-    def getActiveRouteCallback(self) -> Callable:
-        return self.routes[self.activeRoute]
+    def get_active_route_callback(self) -> Callable:
+        return self.routes[self.active_route]
