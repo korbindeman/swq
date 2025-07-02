@@ -69,10 +69,12 @@ def validate_username(username):
         isinstance(username, str) and 
         is_safe_string(username) and 
         is_valid_length(username, 8, 10) and 
-        re.fullmatch(USERNAME_PATTERN, username)):
+        re.fullmatch(USERNAME_PATTERN, username) and
+        username[0].isalpha() or username[0] == '_' and
+        username[-1].isalnum() or username[-1] in "_'."):
         return True, ""
     else:
-        return False, "Username must be 8-10 characters, start with letter/underscore, contain only letters, numbers, underscores, apostrophes, periods"
+        return False, "Username must be 8-10 characters, start with letter/underscore, contain only letters, numbers, underscores, apostrophes, periods, no leading/trailing whitespace"
 
 
 def validate_password(password):
@@ -84,10 +86,12 @@ def validate_password(password):
         any(c in PASSWORD_LOWERCASE for c in password) and
         any(c in PASSWORD_UPPERCASE for c in password) and
         any(c in PASSWORD_DIGITS for c in password) and
-        any(c in PASSWORD_SPECIAL for c in password)):
+        any(c in PASSWORD_SPECIAL for c in password) and
+        password[0] in PASSWORD_ALLOWED_CHARS and
+        password[-1] in PASSWORD_ALLOWED_CHARS):
         return True, ""
     else:
-        return False, "Password must be 12-30 characters with lowercase, uppercase, digit, and special character from allowed set"
+        return False, "Password must be 12-30 characters with lowercase, uppercase, digit, and special character from allowed set, no leading/trailing whitespace"
 
 
 def validate_name(name, field_name="Name"):
@@ -95,10 +99,12 @@ def validate_name(name, field_name="Name"):
         isinstance(name, str) and 
         is_safe_string(name) and 
         is_valid_length(name, 1, 50) and 
-        re.fullmatch(NAME_PATTERN, name)):
+        re.fullmatch(NAME_PATTERN, name) and
+        name[0].isalpha() and
+        name[-1].isalpha()):
         return True, ""
     else:
-        return False, f"{field_name} must be 1-50 characters containing only letters, spaces, apostrophes, hyphens"
+        return False, f"{field_name} must be 1-50 characters containing only letters, spaces, apostrophes, hyphens, start and end with letters"
 
 
 def validate_email(email):
@@ -106,17 +112,21 @@ def validate_email(email):
         isinstance(email, str) and 
         is_safe_string(email) and 
         is_valid_length(email, 5, 100) and 
-        re.fullmatch(EMAIL_PATTERN, email)):
+        re.fullmatch(EMAIL_PATTERN, email) and
+        email[0].isalnum() and
+        email[-1].isalnum()):
         return True, ""
     else:
-        return False, "Email must be 5-100 characters in valid format with allowed characters only"
+        return False, "Email must be 5-100 characters in valid format with allowed characters only, start and end with alphanumeric"
 
 
 def validate_phone_number(phone):
     if (phone and 
         isinstance(phone, str) and 
         is_safe_string(phone) and 
-        re.fullmatch(PHONE_PATTERN, phone)):
+        re.fullmatch(PHONE_PATTERN, phone) and
+        phone[0].isdigit() and
+        phone[-1].isdigit()):
         return True, ""
     else:
         return False, "Mobile phone must be exactly 8 digits (format: +31-6-DDDDDDDD, enter only DDDDDDDD)"
@@ -126,7 +136,9 @@ def validate_postcode(postcode):
     if (postcode and 
         isinstance(postcode, str) and 
         is_safe_string(postcode) and 
-        re.fullmatch(ZIP_CODE_PATTERN, postcode)):
+        re.fullmatch(ZIP_CODE_PATTERN, postcode) and
+        postcode[0].isdigit() and
+        postcode[-1].isupper()):
         return True, ""
     else:
         return False, "Zip code must be exactly DDDDXX format (4 digits + 2 uppercase letters)"
@@ -137,27 +149,33 @@ def validate_city(city):
     if (city and 
         isinstance(city, str) and 
         is_safe_string(city) and 
-        city in allowed_cities):
+        city in allowed_cities and
+        city[0].isalpha() and
+        city[-1].isalpha()):
         return True, ""
     else:
-        return False, f"City must be one of: {', '.join(sorted(allowed_cities))}"
+        return False, f"City must be one of: {', '.join(sorted(allowed_cities))} and start/end with letters"
 
 
 def validate_gender(gender):
     if (gender and 
         isinstance(gender, str) and 
         is_safe_string(gender) and 
-        gender.lower() in ALLOWED_GENDERS):
+        gender.lower() in ALLOWED_GENDERS and
+        gender[0].isalpha() and
+        gender[-1].isalpha()):
         return True, ""
     else:
-        return False, f"Gender must be one of: {', '.join(ALLOWED_GENDERS)}"
+        return False, f"Gender must be one of: {', '.join(ALLOWED_GENDERS)} and start/end with letters"
 
 
 def validate_date(date_str, field_name="Date"):
     if (date_str and 
         isinstance(date_str, str) and 
         is_safe_string(date_str) and 
-        re.fullmatch(ISO_DATUM_PATTERN, date_str)):
+        re.fullmatch(ISO_DATUM_PATTERN, date_str) and
+        date_str[0].isdigit() and
+        date_str[-1].isdigit()):
         try:
             datetime.strptime(date_str, '%Y-%m-%d')
             return True, ""
@@ -171,7 +189,9 @@ def validate_driving_license(license_num):
     if (license_num and 
         isinstance(license_num, str) and 
         is_safe_string(license_num) and 
-        re.fullmatch(DRIVING_LICENSE_PATTERN, license_num)):
+        re.fullmatch(DRIVING_LICENSE_PATTERN, license_num) and
+        license_num[0].isupper() and
+        license_num[-1].isdigit()):
         return True, ""
     else:
         return False, "Driving license must be XXDDDDDDD (2 letters + 7 digits) or XDDDDDDDD (1 letter + 8 digits)"
@@ -181,7 +201,9 @@ def validate_scooter_serial(serial):
     if (serial and 
         isinstance(serial, str) and 
         is_safe_string(serial) and 
-        re.fullmatch(SERIAL_NUMBER_PATTERN, serial)):
+        re.fullmatch(SERIAL_NUMBER_PATTERN, serial) and
+        serial[0].isalnum() and
+        serial[-1].isalnum()):
         return True, ""
     else:
         return False, "Serial number must be 10-17 alphanumeric characters"
@@ -191,7 +213,9 @@ def validate_positive_integer(value, field_name="Value", min_val=None, max_val=N
     if (value and 
         isinstance(value, str) and 
         is_safe_string(value) and 
-        re.fullmatch(POSITIVE_INTEGER_PATTERN, value)):
+        re.fullmatch(POSITIVE_INTEGER_PATTERN, value) and
+        value[0].isdigit() and
+        value[-1].isdigit()):
         try:
             int_val = int(value)
             min_ok = min_val is None or int_val >= min_val
@@ -210,7 +234,9 @@ def validate_positive_float(value, field_name="Value", min_val=None, max_val=Non
     if (value and 
         isinstance(value, str) and 
         is_safe_string(value) and 
-        re.fullmatch(POSITIVE_FLOAT_PATTERN, value)):
+        re.fullmatch(POSITIVE_FLOAT_PATTERN, value) and
+        value[0].isdigit() and
+        value[-1].isdigit()):
         try:
             float_val = float(value)
             min_ok = min_val is None or float_val >= min_val
@@ -229,7 +255,9 @@ def validate_percentage(value, field_name="Percentage"):
     if (value and 
         isinstance(value, str) and 
         is_safe_string(value) and 
-        re.fullmatch(PERCENTAGE_PATTERN, value)):
+        re.fullmatch(PERCENTAGE_PATTERN, value) and
+        value[0].isdigit() and
+        value[-1].isdigit()):
         return True, ""
     else:
         return False, f"{field_name} must be a whole number between 0 and 100"
@@ -240,7 +268,9 @@ def validate_latitude_single(latitude):
         isinstance(latitude, str) and 
         is_safe_string(latitude) and 
         re.fullmatch(GPS_COORDINATE_PATTERN, latitude) and 
-        validate_latitude(latitude)):
+        validate_latitude(latitude) and
+        latitude[0].isdigit() and
+        latitude[-1].isdigit()):
         return True, ""
     else:
         return False, "Latitude must be in Rotterdam region with exactly 5 decimal places (51.80000-52.10000)"
@@ -251,7 +281,9 @@ def validate_longitude_single(longitude):
         isinstance(longitude, str) and 
         is_safe_string(longitude) and 
         re.fullmatch(GPS_COORDINATE_PATTERN, longitude) and 
-        validate_longitude(longitude)):
+        validate_longitude(longitude) and
+        longitude[0].isdigit() and
+        longitude[-1].isdigit()):
         return True, ""
     else:
         return False, "Longitude must be in Rotterdam region with exactly 5 decimal places (4.20000-4.80000)"
@@ -262,10 +294,12 @@ def validate_search_term(search_term):
         isinstance(search_term, str) and 
         is_safe_string(search_term) and 
         is_valid_length(search_term, 1, 100) and 
-        re.fullmatch(SEARCH_PATTERN, search_term)):
+        re.fullmatch(SEARCH_PATTERN, search_term) and
+        search_term[0].isalnum() and
+        search_term[-1].isalnum()):
         return True, ""
     else:
-        return False, "Search term must be 1-100 characters containing only letters, numbers, spaces, apostrophes, hyphens, dots, @ symbols"
+        return False, "Search term must be 1-100 characters containing only letters, numbers, spaces, apostrophes, hyphens, dots, @ symbols, start and end with alphanumeric"
 
 
 def detect_suspicious_input(user_input):
@@ -328,8 +362,8 @@ def detect_suspicious_input(user_input):
 def get_validated_input(prompt, validation_func, *args, **kwargs):
     while True:
         try:
-            user_input = input(prompt).strip()
-            is_valid, error_msg = validation_func(user_input, *args, **kwargs)
+            raw_input = input(prompt)
+            is_valid, error_msg = validation_func(raw_input, *args, **kwargs)
             
             if is_valid:
                 # reset falen count op succesvolle input
@@ -340,7 +374,7 @@ def get_validated_input(prompt, validation_func, *args, **kwargs):
                         del validation_failures[username]
                 except:
                     pass
-                return user_input
+                return raw_input
             else:
                 # log failed validation attempt
                 try:
@@ -353,12 +387,12 @@ def get_validated_input(prompt, validation_func, *args, **kwargs):
                         validation_failures[username] = 0
                     validation_failures[username] += 1
                     
-                    is_suspicious = detect_suspicious_input(user_input)
+                    is_suspicious = detect_suspicious_input(raw_input)
                     
                     if validation_failures[username] >= 3:
                         is_suspicious = True
                     
-                    log_input = user_input[:100] + "..." if len(user_input) > 100 else user_input
+                    log_input = raw_input[:100] + "..." if len(raw_input) > 100 else raw_input
                     
                     failure_info = f"Field prompt: '{prompt.strip()}', Invalid input: '{log_input}', Error: {error_msg}"
                     if validation_failures[username] > 1:
